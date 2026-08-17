@@ -116,6 +116,23 @@
             line-height: 1.6;
         }
 
+        .btn-fullscreen {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background 0.2s;
+        }
+
+        .btn-fullscreen:hover {
+            background: #1d4ed8;
+        }
+
         .exam-box {
             position: relative;
             background: #ffffff;
@@ -170,7 +187,6 @@
             z-index: 10;
         }
 
-        /* Fixed Toast Notification Styles */
         #notification {
             position: fixed;
             top: 24px;
@@ -246,6 +262,22 @@
             <div class="feature-grid">
                 <div class="feature">
                     <div>
+                        <div class="feature-name">Tab / Window Switch Detection</div>
+                        <div class="feature-description">Triggers alert if user changes tab or application.</div>
+                    </div>
+                    <span class="status protected">ACTIVE</span>
+                </div>
+
+                <div class="feature">
+                    <div>
+                        <div class="feature-name">Fullscreen Enforcement</div>
+                        <div class="feature-description">Detects if user exits full-screen mode.</div>
+                    </div>
+                    <span class="status protected">ACTIVE</span>
+                </div>
+
+                <div class="feature">
+                    <div>
                         <div class="feature-name">Right Click</div>
                         <div class="feature-description">Context menu is completely restricted.</div>
                     </div>
@@ -254,16 +286,8 @@
 
                 <div class="feature">
                     <div>
-                        <div class="feature-name">Text Selection</div>
-                        <div class="feature-description">Text highlighting and copy selection disabled.</div>
-                    </div>
-                    <span class="status disabled">DISABLED</span>
-                </div>
-
-                <div class="feature">
-                    <div>
-                        <div class="feature-name">Copy & Cut</div>
-                        <div class="feature-description">Key combinations (Ctrl+C, Ctrl+X) blocked.</div>
+                        <div class="feature-name">Text Selection & Copy</div>
+                        <div class="feature-description">Selection and Ctrl+C, Ctrl+X blocked.</div>
                     </div>
                     <span class="status disabled">DISABLED</span>
                 </div>
@@ -283,40 +307,25 @@
                     </div>
                     <span class="status disabled">DISABLED</span>
                 </div>
-
-                <div class="feature">
-                    <div>
-                        <div class="feature-name">Screenshot Key</div>
-                        <div class="feature-description">PrintScreen resets clipboard (Partial JS limitation).</div>
-                    </div>
-                    <span class="status protected">LIMITED</span>
-                </div>
-
-                <div class="feature">
-                    <div>
-                        <div class="feature-name">Identification Watermark</div>
-                        <div class="feature-description">User email overlaid dynamically on content.</div>
-                    </div>
-                    <span class="status protected">ACTIVE</span>
-                </div>
             </div>
         </div>
 
         <!-- TEST INSTRUCTIONS -->
         <div class="security-card">
             <h2>🧪 Security Test Protocol</h2>
+            <button class="btn-fullscreen" onclick="goFullscreen()">🖥️ Enter Fullscreen Mode</button>
+
             <div class="warning-box">
                 <strong>Try the following actions to test triggers:</strong>
                 <ul style="margin: 8px 0 0; padding-left: 20px;">
+                    <li>Switch to another Browser Tab or Application (<span class="keyboard">Alt</span> + <span
+                            class="keyboard">Tab</span>)</li>
+                    <li>Exit Fullscreen mode using <span class="keyboard">Esc</span> key</li>
                     <li>Right-click anywhere on the screen</li>
-                    <li>Try selecting text with your cursor</li>
-                    <li>Press <span class="keyboard">Ctrl</span> + <span class="keyboard">C</span> or <span
-                            class="keyboard">Ctrl</span> + <span class="keyboard">X</span></li>
-                    <li>Press <span class="keyboard">Ctrl</span> + <span class="keyboard">P</span> or <span
-                            class="keyboard">Ctrl</span> + <span class="keyboard">S</span></li>
+                    <li>Try selecting text or press <span class="keyboard">Ctrl</span> + <span class="keyboard">C</span>
+                    </li>
                     <li>Press <span class="keyboard">F12</span> or <span class="keyboard">Ctrl</span> + <span
                             class="keyboard">U</span></li>
-                    <li>Press <span class="keyboard">PrintScreen</span></li>
                 </ul>
             </div>
         </div>
@@ -354,6 +363,7 @@
 
     <script>
         let toastTimeout;
+        let tabSwitchCount = 0;
 
         // 1. Toast Notification Trigger
         function showWarning(message) {
@@ -364,16 +374,46 @@
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(function () {
                 toast.style.display = "none";
-            }, 2500);
+            }, 3000);
         }
 
-        // 2. Disable Right Click
+        // 2. Tab Change / Window Focus Change Detection
+        document.addEventListener("visibilitychange", function () {
+            if (document.hidden) {
+                tabSwitchCount++;
+                showWarning(`Tab/Window switch detected! (Violation #${tabSwitchCount})`);
+            }
+        });
+
+        window.addEventListener("blur", function () {
+            showWarning("Focus lost! Do not leave the exam window.");
+        });
+
+        // 3. Fullscreen Controller & Detection
+        function goFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+        }
+
+        document.addEventListener("fullscreenchange", function () {
+            if (!document.fullscreenElement) {
+                showWarning("Fullscreen Mode exited! Please return to fullscreen.");
+            }
+        });
+
+        // 4. Disable Right Click
         document.addEventListener("contextmenu", function (event) {
             event.preventDefault();
             showWarning("Right click context menu is disabled!");
         });
 
-        // 3. Disable Clipboard Actions
+        // 5. Disable Clipboard Actions
         document.addEventListener("copy", function (event) {
             event.preventDefault();
             showWarning("Copying text is restricted!");
@@ -384,12 +424,12 @@
             showWarning("Cutting text is restricted!");
         });
 
-        // 4. Disable Selection
+        // 6. Disable Selection
         document.addEventListener("selectstart", function (event) {
             event.preventDefault();
         });
 
-        // 5. Short-key Blocking Logic
+        // 7. Short-key Blocking Logic
         function handleKeyRestrictions(event) {
             const key = event.key.toLowerCase();
 
@@ -428,7 +468,7 @@
         document.addEventListener("keydown", handleKeyRestrictions);
         document.addEventListener("keyup", handleKeyRestrictions);
 
-        // 6. Basic DevTools Inspector Detection
+        // 8. Basic DevTools Inspector Detection
         setInterval(function () {
             const widthDiff = window.outerWidth - window.innerWidth;
             const heightDiff = window.outerHeight - window.innerHeight;
