@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Security Test</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 3px solid #2563eb;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+            font-size: 26px;
+        }
+
+        header p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .security-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .security-card h2 {
+            margin-top: 0;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #0f172a;
+        }
+
+        .feature-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .feature-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .feature-description {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        .status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .disabled {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .protected {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        .warning-box {
+            background: #fffbebfb;
+            border: 1px solid #fde68a;
+            color: #b45309;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .exam-box {
+            position: relative;
+            background: #ffffff;
+            padding: 28px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .question {
+            margin-bottom: 24px;
+        }
+
+        .question h3 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            color: #2563eb;
+        }
+
+        .question p {
+            margin: 0 0 12px;
+            font-weight: 500;
+        }
+
+        .option {
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            margin: 8px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .option:hover {
+            background: #f1f5f9;
+        }
+
+        .watermark {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: rgba(15, 23, 42, 0.05);
+            transform: rotate(-25deg);
+            pointer-events: none;
+            user-select: none;
+            z-index: 10;
+        }
+
+        /* Fixed Toast Notification Styles */
+        #notification {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: #ef4444;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            display: none;
+            z-index: 99999;
+            box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.4);
+            font-weight: 600;
+            font-size: 14px;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .keyboard {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #334155;
+        }
+
+        @media print {
+
+            .exam-box,
+            .container,
+            header {
+                display: none !important;
+            }
+
+            body::after {
+                content: "❌ Printing is strictly disabled for this exam.";
+                display: block;
+                text-align: center;
+                margin-top: 100px;
+                font-size: 24px;
+                font-weight: bold;
+                color: #dc2626;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>🔒 Security Shield Portal</h1>
+        <p>Verification dashboard for strict online exam integrity.</p>
+    </header>
+
+    <div class="container">
+
+        <!-- SECURITY FEATURES -->
+        <div class="security-card">
+            <h2>Security Configurations</h2>
+
+            <div class="feature-grid">
+                <div class="feature">
+                    <div>
+                        <div class="feature-name">Right Click</div>
+                        <div class="feature-description">Context menu is completely restricted.</div>
+                    </div>
+                    <span class="status disabled">DISABLED</span>
+                </div>
+
+                <div class="feature">
+                    <div>
+                        <div class="feature-name">Text Selection</div>
+                        <div class="feature-description">Text highlighting and copy selection disabled.</div>
+                    </div>
+                    <span class="status disabled">DISABLED</span>
+                </div>
+
+                <div class="feature">
+                    <div>
+                        <div class="feature-name">Copy & Cut</div>
+                        <div class="feature-description">Key combinations (Ctrl+C, Ctrl+X) blocked.</div>
+                    </div>
+                    <span class="status disabled">DISABLED</span>
+                </div>
+
+                <div class="feature">
+                    <div>
+                        <div class="feature-name">Print & Save</div>
+                        <div class="feature-description">Ctrl+P and Ctrl+S functions intercepted.</div>
+                    </div>
+                    <span class="status disabled">DISABLED</span>
+                </div>
+
+                <div class="feature">
+                    <div>
+                        <div class="feature-name">Developer Tools</div>
+                        <div class="feature-description">F12 key and source inspection blocked.</div>
+                    </div>
+                    <span class="status disabled">DISABLED</span>
+                </div>
+
+                <div class="feature">
+                    <div>
+                        <div class="feature-name">Screenshot Key</div>
+                        <div class="feature-description">PrintScreen resets clipboard (Partial JS limitation).</div>
+                    </div>
+                    <span class="status protected">LIMITED</span>
+                </div>
+
+                <div class="feature">
+                    <div>
+                        <div class="feature-name">Identification Watermark</div>
+                        <div class="feature-description">User email overlaid dynamically on content.</div>
+                    </div>
+                    <span class="status protected">ACTIVE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEST INSTRUCTIONS -->
+        <div class="security-card">
+            <h2>🧪 Security Test Protocol</h2>
+            <div class="warning-box">
+                <strong>Try the following actions to test triggers:</strong>
+                <ul style="margin: 8px 0 0; padding-left: 20px;">
+                    <li>Right-click anywhere on the screen</li>
+                    <li>Try selecting text with your cursor</li>
+                    <li>Press <span class="keyboard">Ctrl</span> + <span class="keyboard">C</span> or <span
+                            class="keyboard">Ctrl</span> + <span class="keyboard">X</span></li>
+                    <li>Press <span class="keyboard">Ctrl</span> + <span class="keyboard">P</span> or <span
+                            class="keyboard">Ctrl</span> + <span class="keyboard">S</span></li>
+                    <li>Press <span class="keyboard">F12</span> or <span class="keyboard">Ctrl</span> + <span
+                            class="keyboard">U</span></li>
+                    <li>Press <span class="keyboard">PrintScreen</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- EXAM CONTENT -->
+        <div class="security-card">
+            <h2>📝 Sample Exam Content</h2>
+            <div class="exam-box">
+                <div class="watermark">USER: tester@example.com</div>
+
+                <div class="question">
+                    <h3>Question 1</h3>
+                    <p>What is the worst-case time complexity of Binary Search?</p>
+                    <div class="option">A) O(n)</div>
+                    <div class="option">B) O(log n)</div>
+                    <div class="option">C) O(n²)</div>
+                    <div class="option">D) O(1)</div>
+                </div>
+
+                <div class="question">
+                    <h3>Question 2</h3>
+                    <p>Which data structure follows the First-In, First-Out (FIFO) principle?</p>
+                    <div class="option">A) Stack</div>
+                    <div class="option">B) Queue</div>
+                    <div class="option">C) Tree</div>
+                    <div class="option">D) Graph</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="notification"></div>
+
+    <script>
+        let toastTimeout;
+
+        // 1. Toast Notification Trigger
+        function showWarning(message) {
+            const toast = document.getElementById("notification");
+            toast.innerText = "⚠️ " + message;
+            toast.style.display = "block";
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(function () {
+                toast.style.display = "none";
+            }, 2500);
+        }
+
+        // 2. Disable Right Click
+        document.addEventListener("contextmenu", function (event) {
+            event.preventDefault();
+            showWarning("Right click context menu is disabled!");
+        });
+
+        // 3. Disable Clipboard Actions
+        document.addEventListener("copy", function (event) {
+            event.preventDefault();
+            showWarning("Copying text is restricted!");
+        });
+
+        document.addEventListener("cut", function (event) {
+            event.preventDefault();
+            showWarning("Cutting text is restricted!");
+        });
+
+        // 4. Disable Selection
+        document.addEventListener("selectstart", function (event) {
+            event.preventDefault();
+        });
+
+        // 5. Short-key Blocking Logic
+        function handleKeyRestrictions(event) {
+            const key = event.key.toLowerCase();
+
+            // Print Screen Action
+            if (event.key === "PrintScreen") {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText("");
+                }
+                showWarning("Screenshots are restricted!");
+            }
+
+            // Keyboard Shortcuts Control Checks
+            if (event.ctrlKey || event.metaKey) {
+                if (key === "p") {
+                    event.preventDefault();
+                    showWarning("Printing is disabled!");
+                } else if (key === "s") {
+                    event.preventDefault();
+                    showWarning("Saving page is disabled!");
+                } else if (key === "c") {
+                    event.preventDefault();
+                    showWarning("Copy hotkey disabled!");
+                } else if (key === "u") {
+                    event.preventDefault();
+                    showWarning("Viewing source code is disabled!");
+                }
+            }
+
+            // Developer Tools Key
+            if (event.key === "F12") {
+                event.preventDefault();
+                showWarning("Developer Tools key disabled!");
+            }
+        }
+
+        document.addEventListener("keydown", handleKeyRestrictions);
+        document.addEventListener("keyup", handleKeyRestrictions);
+
+        // 6. Basic DevTools Inspector Detection
+        setInterval(function () {
+            const widthDiff = window.outerWidth - window.innerWidth;
+            const heightDiff = window.outerHeight - window.innerHeight;
+
+            if (widthDiff > 200 || heightDiff > 200) {
+                showWarning("Developer Tools panel detected!");
+            }
+        }, 2000);
+    </script>
+
+</body>
+
+</html>
